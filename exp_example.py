@@ -14,8 +14,8 @@ def r(x):
     
 # Jacobian
 def j(x):
-    return np.array([ [ -0.5*exp(x[0])*exp(-x[0]*0.5), -2.0*exp(x[0])*exp(-x[0]*2)],
-                          [ -0.5*exp(x[1])*exp(-x[1]*0.5), -2.0*exp(x[1])*exp(-x[1]*2)] ] )
+    return np.array([ [ -0.5*exp(x[0])*exp(-exp(x[0])*0.5), -2.0*exp(x[0])*exp(-exp(x[0])*2)],
+                          [ -0.5*exp(x[1])*exp(-exp(x[1])*0.5), -2.0*exp(x[1])*exp(-exp(x[1])*2)] ] )
 
 # Directional second derivative
 def Avv(x,v):
@@ -32,7 +32,7 @@ v = InitialVelocity(x, j, Avv)
 def callback(geo):
     # Integrate until the norm of the velocity has grown by a factor of 10
     # and print out some diagnotistic along the way
-    print "Iteration: %i, tau: %f, |v| = %f" %(len(geo.vs), geo.ts[-1], np.linalg.norm(geo.vs[-1]))
+    print("Iteration: %i, tau: %f, |v| = %f" %(len(geo.vs), geo.ts[-1], np.linalg.norm(geo.vs[-1])))
     return np.linalg.norm(geo.vs[-1]) < 10.0
 
 # Construct the geodesic
