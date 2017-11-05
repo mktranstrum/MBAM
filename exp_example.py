@@ -1,21 +1,28 @@
 # An example of calculating a geodesic
-# model takes the form y(t,x) = e^(-x[0]*t) + e^(-x[1]*t) for time points t = 0.5, 2.0
+# model takes the form y(t,x) = e^(-x[0]*t) + e^(-x[1]*t) for time points t = 0.5, 1.0, 2.0
 # We enforce x[i] > 0 by going to log parameters:
 # y(t,x) = e^(-exp(x[0])*t) + e^(-exp(x[1])*t)
+# 
+# We adopt the convention that the model has N parameters and makes M predictions.
+# Then, the output of r(x) should be a vector length M
+# the output of j(x) (i.e., jacobian) should be an M*N matrix
+# theoutput of Avv(x,v) should be a vector of length M
+# In this example, M = 3 (three time points) and N = 2.
 
 from geodesic import geodesic, InitialVelocity
 import numpy as np
 exp = np.exp
 
+t = np.array([0.5, 1.0, 2.0])
+
 # Model predictions
 def r(x):
-    return np.array([ exp(-exp(x[0])*0.5) + exp(-exp(x[1])*0.5), exp(-exp(x[0])*2) + exp(-exp(x[1])*2)])
+    return exp(-exp(x[0])*t) + exp(-exp(x[1])*t)
 
     
 # Jacobian
 def j(x):
-    return np.array([ [ -0.5*exp(x[0])*exp(-exp(x[0])*0.5), -2.0*exp(x[0])*exp(-exp(x[0])*2)],
-                          [ -0.5*exp(x[1])*exp(-exp(x[1])*0.5), -2.0*exp(x[1])*exp(-exp(x[1])*2)] ] )
+    return np.array([ -t*exp(x[0])*exp(-exp(x[0])*t), -t*exp(x[1])*exp(-exp(x[1])*t)]).T
 
 # Directional second derivative
 def Avv(x,v):
@@ -27,6 +34,7 @@ def Avv(x,v):
 # Choose starting parameters
 x = np.log([1.0, 2.0])
 v = InitialVelocity(x, j, Avv)
+
 
 # Callback function used to monitor the geodesic after each step
 def callback(geo):
@@ -48,3 +56,4 @@ pylab.plot(geo.ts, geo.xs)
 pylab.xlabel("tau")
 pylab.ylabel("Parameter Values")
 pylab.show()
+
