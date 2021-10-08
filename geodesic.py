@@ -1,11 +1,16 @@
 from scipy.integrate import ode
 import numpy as np
 
-# A default callback function
-# the geodesic can be halted by the callback returning False
-
 
 def callback_func(geo):
+    """A default callback function. The geodesic can be halted by the callback
+    returning False
+
+    Parameters
+    ----------
+    geo: object
+        The current instance of the ``geodesic`` class.
+    """
     return True
 
 
@@ -47,13 +52,13 @@ class geodesic(ode):
             Number of model predictions.
         N: int
             Number of model parameters.
-        x: (N,) array_like
+        x: (N,) np.ndarray
             Vector of initial parameter values.
         v: np.ndarray
             Vector of initial velocity.
         lam: float (optional)
             Set to nonzero to calculate geodesic on the model graph.
-        dtd: (N, N) array_like (optional)
+        dtd: (N, N) np.ndarray (optional)
             Metric for the parameter space contribution to the model graph.
         atol: float (optional)
             Aabsolute tolerance for solving the geodesic
@@ -71,6 +76,19 @@ class geodesic(ode):
             Set to true to use the singular value decomposition to calculate
             the inverse metric. This is slower, but can help with nearly
             singular FIM.
+
+        Attributes
+        ----------
+        xs: (T, N) np.ndarray
+            Geodesics in the parameter space.
+        rs: (T, M) np.ndarray
+            Geodesics in the data space.
+        vs: (T, N) np.ndarray
+            Velocity in the parameter space.
+        vels: (T, M) np.ndarray
+            Velocity in the data space.
+        ts: (T,) np.ndarray
+            Geodesics time.
         """
 
         self.r, self.j, self.Avv = r, j, Avv
@@ -90,7 +108,7 @@ class geodesic(ode):
         else:
             self.callback = callback
         self.parameterspacenorm = parameterspacenorm
-        self.invSVD = False
+        self.invSVD = invSVD
 
     def geodesic_rhs(self, t, xv):
         """This function implements the RHS of the geodesic equation. This
@@ -104,9 +122,9 @@ class geodesic(ode):
 
         Parameters
         ----------
-        t:
+        t: float
             "time" of the geodesic (tau).
-        xv: (2N,) array_like
+        xv: (2N,) np.ndarray
             Vector of current parameters and velocities.
         """
         x = xv[: self.N]
@@ -128,9 +146,9 @@ class geodesic(ode):
 
         Parameters
         ----------
-        x:
+        x: np.ndarray
             Vector of initial parameter values.
-        v:
+        v: np.ndarray
             Vector of initial velocity.
         """
         self.xs = np.array([x])
@@ -145,7 +163,7 @@ class geodesic(ode):
 
         Parameters
         ----------
-        dt:
+        dt: float
             target time step to use
         """
         ode.integrate(self, self.t + dt, step=1)
@@ -185,7 +203,7 @@ def InitialVelocity(x, jac, Avv):
 
     Parameters
     ----------
-    x: (N,) array_like
+    x: (N,) np.ndarray
         Initial Parameter Values.
     jac: callable ``jac(x)``
         Function for calculating the jacobian.
