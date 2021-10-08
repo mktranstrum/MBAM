@@ -45,7 +45,7 @@ def callback(geo):
 
 # Construct the geodesic
 # It is usually not necessary to be very accurate here, so we set small tolerances
-geo = geodesic(r, j, Avv, 2, 2, x, v, atol = 1e-2, rtol = 1e-2, callback = callback)  
+geo = geodesic(r, j, Avv, 3, 2, x, v, atol = 1e-2, rtol = 1e-2, callback = callback)  
 
 # Integrate
 geo.integrate(25.0)
