@@ -130,15 +130,15 @@ class geodesic(ode):
         x = xv[: self.N]
         v = xv[self.N :]
         j = self.j(x)
-        g = np.dot(j.T, j) + self.lam * self.dtd
+        g = j.T @ j + self.lam * self.dtd
         Avv = self.Avv(x, v)
         if self.invSVD:
             u, s, vh = np.linalg.svd(j, 0)
-            a = -np.dot(vh.T, np.dot(u.T, Avv) / s)
+            a = -vh.T @ (u.T @ Avv) / s
         else:
-            a = -np.linalg.solve(g, np.dot(j.T, Avv))
+            a = -np.linalg.solve(g, j.T @ Avv)
         if self.parameterspacenorm:
-            a -= np.dot(a, v) * v / np.dot(v, v)
+            a -= a @ v * v / (v @ v)
         return np.append(v, a)
 
     def set_initial_value(self, x, v):
@@ -155,7 +155,7 @@ class geodesic(ode):
         self.vs = np.array([v])
         self.ts = np.array([0.0])
         self.rs = np.array([self.r(x)])
-        self.vels = np.array([np.dot(self.j(x), v)])
+        self.vels = np.array([self.j(x) @ v])
         ode.set_initial_value(self, np.append(x, v), 0.0)
 
     def step(self, dt=1.0):
@@ -171,7 +171,7 @@ class geodesic(ode):
         self.vs = np.append(self.vs, [self.y[self.N :]], axis=0)
         self.rs = np.append(self.rs, [self.r(self.xs[-1])], axis=0)
         self.vels = np.append(
-            self.vels, [np.dot(self.j(self.xs[-1]), self.vs[-1])], axis=0
+            self.vels, [self.j(self.xs[-1]) @ self.vs[-1]], axis=0
         )
         self.ts = np.append(self.ts, self.t)
 
@@ -219,9 +219,9 @@ def InitialVelocity(x, jac, Avv):
     j = jac(x)
     u, s, vh = np.linalg.svd(j)
     v = vh[-1]
-    a = -np.linalg.solve(np.dot(j.T, j), np.dot(j.T, Avv(x, v)))
+    a = -np.linalg.solve(j.T @ j, j.T @ Avv(x, v))
     # We choose the direction in which the velocity will increase, since this
     # is most likely to find a singularity quickest.
-    if np.dot(v, a) < 0:
+    if v @ a < 0:
         v *= -1
     return v
