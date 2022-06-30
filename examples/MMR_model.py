@@ -1,7 +1,8 @@
 import numpy as np
 from scipy.integrate import odeint
 
-import FiniteDifference  # For finite difference estimates of derivatives
+# For finite difference estimates of derivatives
+from MBAM import finite_difference
 
 exp = np.exp
 # Time points to sample model. We do not observe t = 0, but is necessary for
@@ -47,13 +48,13 @@ def j(x):
 
 def j_FD(x):
     """Alternatively, calculate jacobian using finite differences. See useful,
-    higher-order formulas in `FiniteDifference.py`.
+    higher-order formulas in `finite_difference.py`.
     """
     vs = np.eye(2)
     return np.array(
         [
-            FiniteDifference.CD4(r, x, vs[:, 0], 1e-2),
-            FiniteDifference.CD4(r, x, vs[:, 1], 1e-2),
+            finite_difference.CD4(r, x, vs[:, 0], 1e-2),
+            finite_difference.CD4(r, x, vs[:, 1], 1e-2),
         ]
     ).T
 
@@ -63,4 +64,4 @@ def Avv(x, v):
     the sensitivity equations or using finite differences.  Here, we use finite
     differences.
     """
-    return FiniteDifference.AvvCD4(r, x, v, 1e-2)
+    return finite_difference.AvvCD4(r, x, v, 1e-2)

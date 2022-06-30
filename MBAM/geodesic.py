@@ -1,23 +1,74 @@
-from scipy.integrate import ode
 import numpy as np
-
-
-def callback_func(geo):
-    """A default callback function. The geodesic can be halted by the callback
-    returning False
-
-    Parameters
-    ----------
-    geo: object
-        The current instance of the ``geodesic`` class.
-    """
-    return True
+from scipy.integrate import ode
 
 
 # We construct a geodesic class that inherits from scipy's ode class
+class Geodesic(ode):
+    """A class to formulate and solve the geodesic equation of a model.
 
+    Parameters
+    ----------
+    r: callable ``r(x)``
+        Function for calculating the model. This is not needed for the
+        geodesic, but is used to save the geodesic path in data space.
+    j: callable ``j(x)``
+        Function for calculating the jacobian of the model with respect to
+        parameters. The default function uses forward difference method.
+    Avv: callable ``Avv(x,v)``
+        Function for calculating the second directional derivative of the
+        model in a direction ``v``. The default function uses central
+        difference method.
+    M: int
+        Number of model predictions.
+    N: int
+        Number of model parameters.
+    x: (N,) np.ndarray
+        Vector of initial parameter values.
+    v: np.ndarray
+        Vector of initial velocity.
+    lam: float (optional)
+        Set to non-zero to calculate geodesic on the model graph.
+    dtd: (N, N) np.ndarray (optional)
+        Metric for the parameter space contribution to the model graph.
+    atol: float (optional)
+        Absolute tolerance for solving the geodesic.
+    rtol: float (optional)
+        Relative tolerance for solving geodesic.
+    callback: callable ``callback(geo)`` (optional)
+        Function called after each geodesic step. Called as
+        ``callback(geo)`` where ``geo`` is the current instance of the
+        ``geodesic`` class.
+    parameterspacenorm: bool (optional)
+        Set to ``True`` to reparameterize the geodesic to have a constant
+        parameter space norm. (Default is to have a constant data space
+        norm.)
+    invSVD: bool (optional)
+        Set to true to use the singular value decomposition to calculate
+        the inverse metric. This is slower, but can help with nearly
+        singular FIM.
 
-class geodesic(ode):
+    Attributes
+    ----------
+    xs: (T, N) np.ndarray
+        Geodesics in the parameter space.
+    rs: (T, M) np.ndarray
+        Geodesics in the data space.
+    vs: (T, N) np.ndarray
+        Velocity in the parameter space.
+    vels: (T, M) np.ndarray
+        Velocity in the data space.
+    ts: (T,) np.ndarray
+        Geodesics time.
+
+    Notes
+    -----
+    If the prediction points are weighted differently, then the weights need
+    to be included in the Jacobian and directional second derivative
+    functions. An option to do this is to use the residual function when
+    computing the Jacobian and Avv, assuming that the weights are encoded
+    in the residual.
+    """
+
     def __init__(
         self,
         r,
@@ -35,78 +86,29 @@ class geodesic(ode):
         parameterspacenorm=False,
         invSVD=False,
     ):
-        """Construct an instance of the geodesic object.
 
-        Parameters
-        ----------
-        r: callable ``r(x)``
-            Function for calculating the model. This is not needed for the
-            geodesic, but is used to save the geodesic path in data space.
-        j: callable ``j(x)``
-            Function for calculating the jacobian of the model with respect to
-            parameters.
-        Avv: callable ``Avv(x,v)``
-            Function for calculating the second directional derivative of the
-            model in a direction ``v``.
-        M: int
-            Number of model predictions.
-        N: int
-            Number of model parameters.
-        x: (N,) np.ndarray
-            Vector of initial parameter values.
-        v: np.ndarray
-            Vector of initial velocity.
-        lam: float (optional)
-            Set to nonzero to calculate geodesic on the model graph.
-        dtd: (N, N) np.ndarray (optional)
-            Metric for the parameter space contribution to the model graph.
-        atol: float (optional)
-            Aabsolute tolerance for solving the geodesic
-        rtol: float (optional)
-            Relative tolerance for solving geodesic
-        callback: callable (optional)
-            Function called after each geodesic step. Called as
-            ``callback(geo)`` where ``geo`` is the current instance of the
-            ``geodesic`` class.
-        parameterspacenorm: bool (optional)
-            Set to True to reparameterize the geodesic to have a constant
-            parameter space norm. (Default is to have a constant data space
-            norm.)
-        invSVD: bool (optional)
-            Set to true to use the singular value decomposition to calculate
-            the inverse metric. This is slower, but can help with nearly
-            singular FIM.
-
-        Attributes
-        ----------
-        xs: (T, N) np.ndarray
-            Geodesics in the parameter space.
-        rs: (T, M) np.ndarray
-            Geodesics in the data space.
-        vs: (T, N) np.ndarray
-            Velocity in the parameter space.
-        vels: (T, M) np.ndarray
-            Velocity in the data space.
-        ts: (T,) np.ndarray
-            Geodesics time.
-        """
-
-        self.r, self.j, self.Avv = r, j, Avv
+        # Dimensionality of the problem
         self.M, self.N = M, N
+
+        # Functions needed in the calculation
+        self.r, self.j, self.Avv = r, j, Avv
+
+        # Initialize the ODE object
+        ode.__init__(self, self.geodesic_rhs, jac=None)
+        self.set_initial_value(x, v)
+        ode.set_integrator(self, "vode", atol=atol, rtol=rtol)
+
+        if callback is None:
+            self.callback = callback_func
+        else:
+            self.callback = callback
+
+        # Additional settings for RHS function
         self.lam = lam
         if dtd is None:
             self.dtd = np.eye(N)
         else:
             self.dtd = dtd
-        self.atol = atol
-        self.rtol = rtol
-        ode.__init__(self, self.geodesic_rhs, jac=None)
-        self.set_initial_value(x, v)
-        ode.set_integrator(self, "vode", atol=atol, rtol=rtol)
-        if callback is None:
-            self.callback = callback_func
-        else:
-            self.callback = callback
         self.parameterspacenorm = parameterspacenorm
         self.invSVD = invSVD
 
@@ -198,30 +200,13 @@ class geodesic(ode):
             cont = self.callback(self)
 
 
-def InitialVelocity(x, jac, Avv):
-    """Routine for calculating the initial velocity.
+def callback_func(geo):
+    """A default callback function. The geodesic can be halted by the callback
+    returning False.
 
     Parameters
     ----------
-    x: (N,) np.ndarray
-        Initial Parameter Values.
-    jac: callable ``jac(x)``
-        Function for calculating the jacobian.
-    Avv: callable ``Avv(x, v)``
-        Function for calculating a direction second derivative.
-
-    Returns
-    -------
-    v:
-        Initial velocity vector.
+    geo: object
+        The current instance of the ``geodesic`` class.
     """
-
-    j = jac(x)
-    u, s, vh = np.linalg.svd(j)
-    v = vh[-1]
-    a = -np.linalg.solve(j.T @ j, j.T @ Avv(x, v))
-    # We choose the direction in which the velocity will increase, since this
-    # is most likely to find a singularity quickest.
-    if v @ a < 0:
-        v *= -1
-    return v
+    return True

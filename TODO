@@ -1,0 +1,9 @@
+TODO list
+- [ ] Convert the geodesic/MBAM into a Python package (WIP)
+- [ ] Work on the interface (check with Mark)
+- [ ] Work on the organization of the package (check with Mark)
+- [X] Documentation for each functions
+- [ ] Documentation for the package (need to be publishable)
+- [ ] Unit test
+- [ ] Check on the existing examples (need documentation)
+- [ ] Add more examples (?)

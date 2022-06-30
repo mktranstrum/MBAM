@@ -19,26 +19,26 @@ The output of :math:`Avv(x,v)` should be a vector of length M. In this example,
 :math:`M = 3` (three time points) and :math:`N = 2`.
 """
 
-from geodesic import geodesic, InitialVelocity
+from MBAM import Geodesic, initial_velocity
 import numpy as np
-import pylab
+import matplotlib.pyplot as plt
 
-exp = np.exp
 
+# Time series
 t = np.array([0.5, 1.0, 2.0])
 
 
 def r(x):
     """Model predictions"""
-    return exp(-exp(x[0]) * t) + exp(-exp(x[1]) * t)
+    return np.exp(-np.exp(x[0]) * t) + np.exp(-np.exp(x[1]) * t)
 
 
 def j(x):
     """Jacobian"""
     return np.array(
         [
-            -t * exp(x[0]) * exp(-exp(x[0]) * t),
-            -t * exp(x[1]) * exp(-exp(x[1]) * t),
+            -t * np.exp(x[0]) * np.exp(-np.exp(x[0]) * t),
+            -t * np.exp(x[1]) * np.exp(-np.exp(x[1]) * t),
         ]
     ).T
 
@@ -51,7 +51,7 @@ def Avv(x, v):
 
 # Choose starting parameters
 x = np.log([1.0, 2.0])
-v = InitialVelocity(x, j, Avv)
+v = initial_velocity(x, j, Avv)
 
 # Set the dimensions
 M = len(t)
@@ -72,13 +72,14 @@ def callback(g):
 # Construct the geodesic
 # It is usually not necessary to be very accurate here, so we set small
 # tolerances
-geo = geodesic(r, j, Avv, M, N, x, v, atol=1e-2, rtol=1e-2, callback=callback)
+geo = Geodesic(r, j, Avv, M, N, x, v, atol=1e-2, rtol=1e-2, callback=callback)
 
 # Integrate
 geo.integrate(25.0)
 # plot the geodesic path to find the limit
 # This should show the singularity at the "fold line" x[0] = x[1]
-pylab.plot(geo.ts, geo.xs)
-pylab.xlabel("tau")
-pylab.ylabel("Parameter Values")
-pylab.show()
+plt.figure()
+plt.plot(geo.ts, geo.xs)
+plt.xlabel("tau")
+plt.ylabel("Parameter Values")
+plt.show()

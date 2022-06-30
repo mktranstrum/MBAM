@@ -1,15 +1,14 @@
 from matplotlib import cm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import pylab
 import numpy as np
-from MMR import M, r, j, Avv
-from geodesic import geodesic, InitialVelocity
+from MMR_model import M, r, j, Avv
+from MBAM import Geodesic, initial_velocity
 
 
 # Choose starting parameters
 x = np.log([1.0, 1.0])
-v = InitialVelocity(x, j, Avv)
+v = initial_velocity(x, j, Avv)
 N = len(x)
 
 
@@ -27,7 +26,7 @@ def callback(g):
 # Construct the geodesic
 # It is usually not necessary to be very accurate here, so we set small
 # tolerances
-geo_forward = geodesic(
+geo_forward = Geodesic(
     r, j, Avv, M, N, x, v, atol=1e-2, rtol=1e-2, callback=callback
 )
 
@@ -35,23 +34,23 @@ geo_forward = geodesic(
 geo_forward.integrate(25.0)
 # plot the geodesic path to find the limit
 # This should show the singularity at the "fold line" x[0] = x[1]
-pylab.figure()
-pylab.plot(geo_forward.ts, geo_forward.xs)
-pylab.xlabel("tau")
-pylab.ylabel("Parameter Values")
-pylab.show()
+plt.figure()
+plt.plot(geo_forward.ts, geo_forward.xs)
+plt.xlabel("tau")
+plt.ylabel("Parameter Values")
+plt.show()
 
 
 # Now do opposite direction
 
 # Choose starting parameters
 # x = np.log([1.0, 1.0])
-v *= -1  # v = -InitialVelocity(x, j, Avv)
+v *= -1  # v = -initial_velocity(x, j, Avv)
 
 # Construct the geodesic
 # It is usually not necessary to be very accurate here, so we set small
 # tolerances
-geo_reverse = geodesic(
+geo_reverse = Geodesic(
     r, j, Avv, M, N, x, v, atol=1e-2, rtol=1e-2, callback=callback
 )
 
@@ -60,10 +59,10 @@ geo_reverse.integrate(25.0)
 # plot the geodesic path to find the limit
 # This should show the singularity at the "fold line" x[0] = x[1]
 # Add The geodesic to the same plot, with negative time points
-pylab.plot(-geo_reverse.ts, geo_reverse.xs)
-pylab.xlabel("tau")
-pylab.ylabel("Parameter Values")
-pylab.show()
+plt.plot(-geo_reverse.ts, geo_reverse.xs)
+plt.xlabel("tau")
+plt.ylabel("Parameter Values")
+plt.show()
 
 
 # Now construct contour plots in parameter space and model manifold in data
@@ -82,14 +81,14 @@ for i, x in enumerate(xs):
         C[j, i] = np.linalg.norm(temp - r0) ** 2
 
 # Plot geodesic path in parameter space with cost contours
-pylab.figure()
-pylab.contourf(xs, xs, C, 50)
-pylab.plot(geo_forward.xs[:, 0], geo_forward.xs[:, 1], "r-")
-pylab.plot(geo_reverse.xs[:, 0], geo_reverse.xs[:, 1], "g-")
-pylab.plot([0], [0], "ro")
-pylab.xlim(-5, 5)
-pylab.ylim(-5, 5)
-pylab.show()
+plt.figure()
+plt.contourf(xs, xs, C, 50)
+plt.plot(geo_forward.xs[:, 0], geo_forward.xs[:, 1], "r-")
+plt.plot(geo_reverse.xs[:, 0], geo_reverse.xs[:, 1], "g-")
+plt.plot([0], [0], "ro")
+plt.xlim(-5, 5)
+plt.ylim(-5, 5)
+plt.show()
 
 # Plot surface / geodesic in data space
 
