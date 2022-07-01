@@ -99,7 +99,7 @@ def AuvCD4(f, x, u, v, h):
 
 def jacobian_func(f, M, N, deriv_fn=FD, h=0.1):
     """A wrapper function convert functions to compute directional first
-    derivative to the jacobian function needed in :class:`~MBAM.geodesic`.
+    derivative to the jacobian function needed in :class:`~mbam.geodesic`.
 
     Parameters
     ----------
@@ -117,7 +117,7 @@ def jacobian_func(f, M, N, deriv_fn=FD, h=0.1):
     Returns
     -------
     jacobian: callable ``jacobian(x)``
-        A function that evaluates the Jacobian of the model ``r`` at parameter
+        A function that evaluates the Jacobian of the model ``f`` at parameter
         ``x``.
 
     Notes
@@ -141,7 +141,7 @@ def jacobian_func(f, M, N, deriv_fn=FD, h=0.1):
 
 def Avv_func(f, Avv_fn=AvvCD, h=0.1):
     """A wrapper function convert functions to compute directional second
-    derivative to the Avv function needed in :class:`~MBAM.geodesic`.
+    derivative to the Avv function needed in :class:`~mbam.geodesic`.
 
     Parameters
     ----------

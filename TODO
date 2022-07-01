@@ -11,4 +11,5 @@ TODO list
   - [ ] Contact
   - [ ] Licence
 - [ ] A wrapper to compute jacobian and Avv using autograd/JAX.
-- [ ] Unit test
+- [X] Unit test
+  - [X] Derivative: Compare analytic to finite difference, jacobian, Avv, jax
