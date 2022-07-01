@@ -1,13 +1,10 @@
 #!/usr/bin/env python
-import pkg_resources
 import setuptools
 import re
 
 # List of dependecy packages
-install_requires = [
-    "numpy>=1.19.0",
-    "scipy>=1.5.0",
-]
+with open("requirements.txt") as f:
+    install_requires = [line.strip() for line in f.readlines()]
 
 # Find packages
 packages = setuptools.find_packages(exclude=["examples"])
@@ -15,7 +12,9 @@ packages = setuptools.find_packages(exclude=["examples"])
 # Description of the package
 description = "Model reduction by Manifold Boundary Approximation Method"
 with open("README.md") as f:
-    long_description = f.read()
+    lines = f.readlines()
+description = lines[1].strip()
+long_description = "".join(lines)
 
 # Get the current version number
 with open("MBAM/__init__.py") as fd:
@@ -26,6 +25,9 @@ setuptools.setup(
     name="MBAM",
     version=version,
     author="Mark K. Transtrum",
+    author_email="mktranstrum@byu.edu",
+    maintainer="Yonatan Kurniawan",
+    maintainer_email="kurniawanyo@outlook.com",
     url="https://github.com/mktranstrum/MBAM",
     description=description,
     long_description=long_description,
