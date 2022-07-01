@@ -1,9 +1,14 @@
 TODO list
 - [ ] Convert the geodesic/MBAM into a Python package (WIP)
-- [ ] Work on the interface (check with Mark)
-- [ ] Work on the organization of the package (check with Mark)
+  - [ ] Work on the interface (check with Mark)
+  - [ ] Work on the organization of the package (check with Mark)
 - [X] Documentation for each functions
-- [ ] Documentation for the package (need to be publishable)
+- [ ] README
+  - [ ] Background - Refer to the paper: 2011 PRE and the 2014 PRL
+  - [ ] Installation
+  - [ ] Example
+  - [ ] Attribution - How to cite the papers, give BibTex entry
+  - [ ] Contact
+  - [ ] Licence
+- [ ] A wrapper to compute jacobian and Avv using autograd/JAX.
 - [ ] Unit test
-- [ ] Check on the existing examples (need documentation)
-- [ ] Add more examples (?)
