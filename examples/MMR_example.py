@@ -2,14 +2,13 @@ from matplotlib import cm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-from MMR_model import M, r, j, Avv
-from MBAM import Geodesic, initial_velocity
+from mbam import Geodesic, initial_velocity
 
+from MMR_model import M, N, r, j, Avv
 
 # Choose starting parameters
 x = np.log([1.0, 1.0])
 v = initial_velocity(x, j, Avv)
-N = len(x)
 
 
 def callback(g):
@@ -92,8 +91,8 @@ plt.show()
 
 # Plot surface / geodesic in data space
 
-fig = plt.figure()
-ax = fig.gca(projection="3d")
+plt.figure()
+ax = plt.axes(projection="3d")
 surf = ax.plot_surface(
     X, Y, Z, cmap=cm.coolwarm, linewidth=0, antialiased=False
 )

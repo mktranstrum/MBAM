@@ -2,13 +2,14 @@ import numpy as np
 from scipy.integrate import odeint
 
 # For finite difference estimates of derivatives
-from MBAM import finite_difference
+from mbam.finite_difference import jacobian_func, Avv_func, CD4, AvvCD4
 
 exp = np.exp
 # Time points to sample model. We do not observe t = 0, but is necessary for
 # the ODE solver
 ts = np.array([0.0, 1.0, 2.0, 5.0])
 M = len(ts) - 1  # Number of predictions that the model makes
+N = 2  # Target number of parameters
 
 
 def rhs(y, t, x):
@@ -46,22 +47,12 @@ def j(x):
     return odeint(drhs, [1.0, 0.0, 0.0], ts, (x,))[1:, 1:]
 
 
-def j_FD(x):
-    """Alternatively, calculate jacobian using finite differences. See useful,
-    higher-order formulas in `finite_difference.py`.
-    """
-    vs = np.eye(2)
-    return np.array(
-        [
-            finite_difference.CD4(r, x, vs[:, 0], 1e-2),
-            finite_difference.CD4(r, x, vs[:, 1], 1e-2),
-        ]
-    ).T
+# Alternatively, calculate jacobian using finite differences. See useful,
+# higher-order formulas in `finite_difference.py`.
+j_FD = jacobian_func(r, M, N, CD4, h=1e-2)
 
 
-def Avv(x, v):
-    """Directional second derivative. This can also be done by either solving
-    the sensitivity equations or using finite differences.  Here, we use finite
-    differences.
-    """
-    return finite_difference.AvvCD4(r, x, v, 1e-2)
+# Directional second derivative. This can also be done by either solving
+# the sensitivity equations or using finite differences.  Here, we use finite
+# differences.
+Avv = Avv_func(r, AvvCD4, h=1e-2)

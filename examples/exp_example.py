@@ -2,24 +2,26 @@
 
 .. math::
 
-    y(t,x) = e^{-x[0]*t} + e^{-x[1]*t},
+    y(t,x) = e^{-\theta_0 t} + e^{-\theta_1 t},
 
-for time points :math:`t = 0.5, 1.0, 2.0`.
+for time points :math:`t = \{0.5, 1.0, 2.0\}`.
 
-We enforce :math:`x[i] > 0` by going to log parameters:
+We enforce :math:`\theta_i > 0` by going to log parameters:
 
 .. math::
 
-    y(t,x) = e^{-exp(x[0])*t} + e^{-exp(x[1])*t}
+    y(t,x) = e^{-\exp(\phi_0) t} + e^{-\exp(\phi_1) t},
 
-We adopt the convention that the model has N parameters and makes M
-predictions. Then, the output of :math:`r(x)` should be a vector length M the
-output of :math:`j(x)` (i.e., jacobian) should be an :math:`M \times N` matrix.
-The output of :math:`Avv(x,v)` should be a vector of length M. In this example,
-:math:`M = 3` (three time points) and :math:`N = 2`.
+where :math:`\theta_i = \exp(\phi_i)`.
+
+We adopt the convention that the model has :math:`N` parameters and makes
+:math:`M` predictions. Then, the output of :math:`r(x)` should be a vector
+length M the output of :math:`j(x)` (i.e., jacobian) should be an
+:math:`M \times N` matrix. The output of :math:`Avv(x,v)` should be a vector of
+length M. In this example, :math:`M = 3` (three time points) and :math:`N = 2`.
 """
 
-from MBAM import Geodesic, initial_velocity
+from mbam import Geodesic, initial_velocity
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -66,7 +68,7 @@ def callback(g):
         "Iteration: %i, tau: %f, |v| = %f"
         % (len(g.vs), g.ts[-1], np.linalg.norm(g.vs[-1]))
     )
-    return np.linalg.norm(g.vs[-1]) < 10.0
+    return np.linalg.norm(g.vs[-1]) < 20.0
 
 
 # Construct the geodesic

@@ -17,12 +17,12 @@ description = lines[1].strip()
 long_description = "".join(lines)
 
 # Get the current version number
-with open("MBAM/__init__.py") as fd:
+with open("mbam/__init__.py") as fd:
     version = re.search('__version__ = "(.*)"', fd.read()).group(1)
 
 
 setuptools.setup(
-    name="MBAM",
+    name="mbam",
     version=version,
     author="Mark K. Transtrum",
     author_email="mktranstrum@byu.edu",
