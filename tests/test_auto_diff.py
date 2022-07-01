@@ -1,11 +1,12 @@
 import pytest
 
 import numpy as np
-import mbam.auto_diff as ad
 
 import model
 from model import jac_an, Avv_an, xi, vi
 
+if model.jax_avail:
+    import mbam.auto_diff as ad
 
 J = jac_an(xi)
 Avv = Avv_an(xi, vi)
@@ -24,5 +25,6 @@ def test_Avv_AD():
 
 
 if __name__ == "__main__":
-    test_jac_AD()
-    test_Avv_AD()
+    if model.jax_avail:
+        test_jac_AD()
+        test_Avv_AD()

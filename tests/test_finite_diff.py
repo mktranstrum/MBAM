@@ -1,6 +1,5 @@
 import numpy as np
 import mbam.finite_difference as fd
-import mbam.auto_diff as ad
 
 from model import M, N, f, jac_an, Avv_an, xi, vi
 
