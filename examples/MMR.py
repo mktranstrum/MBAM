@@ -16,18 +16,14 @@ def rhs(y, t, x):
     return -exp(x[0]) * y / (exp(x[1]) + y)
 
 
+# Returns our observation vector.
 def r(x):
-    """Returns our observation vector."""
     return odeint(rhs, [1.0], ts, (x,))[1:, 0]
 
 
+# Sensitivities ODE
 def drhs(y, t, x):
-    """Sensitivities ODE.
-
-    .. math::
-        y[0] = y, y[1] = dy/dx[0], y[2] = dy/dx[1]
-
-    """
+    # y[0] = y, y[1] = dy/dx[0], y[2] = dy/dx[1]
 
     # deriviatve of rhs with respect to y
     drhsdy = -exp(x[0] + x[1]) / (exp(x[1]) + y[0]) ** 2
@@ -42,8 +38,8 @@ def drhs(y, t, x):
     ]
 
 
+# Jacobian
 def j(x):
-    """Jacobian"""
     return odeint(drhs, [1.0, 0.0, 0.0], ts, (x,))[1:, 1:]
 
 

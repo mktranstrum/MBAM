@@ -4,15 +4,16 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from mbam import Geodesic, initial_velocity
 
-from MMR_model import M, N, r, j, Avv
+from MMR import M, N, r, j, Avv
+
 
 # Choose starting parameters
 x = np.log([1.0, 1.0])
 v = initial_velocity(x, j, Avv)
 
 
+# Callback function used to monitor the geodesic after each step
 def callback(g):
-    """Callback function used to monitor the geodesic after each step."""
     # Integrate until the norm of the velocity has grown by a factor of 10
     # and print out some diagnotistic along the way
     print(
@@ -31,7 +32,8 @@ geo_forward = Geodesic(
 
 # Integrate
 geo_forward.integrate(25.0)
-# plot the geodesic path to find the limit
+
+# Plot the geodesic path to find the limit
 # This should show the singularity at the "fold line" x[0] = x[1]
 plt.figure()
 plt.plot(geo_forward.ts, geo_forward.xs)
@@ -43,8 +45,8 @@ plt.show()
 # Now do opposite direction
 
 # Choose starting parameters
-# x = np.log([1.0, 1.0])
-v *= -1  # v = -initial_velocity(x, j, Avv)
+x = np.log([1.0, 1.0])
+v = -initial_velocity(x, j, Avv)
 
 # Construct the geodesic
 # It is usually not necessary to be very accurate here, so we set small
@@ -55,7 +57,8 @@ geo_reverse = Geodesic(
 
 # Integrate
 geo_reverse.integrate(25.0)
-# plot the geodesic path to find the limit
+
+# Plot the geodesic path to find the limit
 # This should show the singularity at the "fold line" x[0] = x[1]
 # Add The geodesic to the same plot, with negative time points
 plt.plot(-geo_reverse.ts, geo_reverse.xs)
@@ -90,7 +93,6 @@ plt.ylim(-5, 5)
 plt.show()
 
 # Plot surface / geodesic in data space
-
 plt.figure()
 ax = plt.axes(projection="3d")
 surf = ax.plot_surface(
@@ -103,7 +105,7 @@ Y = np.empty(len(geo.xs))
 Z = np.empty(len(geo.xs))
 for i, x in enumerate(geo.xs):
     X[i], Y[i], Z[i] = r(x)
-ax.plot(X, Y, Z, color=(1, 0, 0))
+ax.plot(X, Y, Z, color="r", zorder=10)
 
 geo = geo_reverse
 X = np.empty(len(geo.xs))
@@ -111,9 +113,9 @@ Y = np.empty(len(geo.xs))
 Z = np.empty(len(geo.xs))
 for i, x in enumerate(geo.xs):
     X[i], Y[i], Z[i] = r(x)
-ax.plot(X, Y, Z, color=(0, 1, 0))
+ax.plot(X, Y, Z, color="g", zorder=10)
 
 
 # Plot starting point of geodesic as a red dot
-ax.scatter([r0[0]], [r0[1]], [r0[2]], c="r", s=25)
+ax.scatter([r0[0]], [r0[1]], [r0[2]], c="r", s=25, zorder=10)
 plt.show()
