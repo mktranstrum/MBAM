@@ -1,7 +1,7 @@
 import numpy as np
 import mbam.finite_difference as fd
 
-from model import M, N, f, jac_an, Avv_an, xi, vi
+from model_exp import M, N, f, jac_an, Avv_an, xi, vi
 
 
 J = jac_an(xi)

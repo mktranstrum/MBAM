@@ -2,8 +2,8 @@ import pytest
 
 import numpy as np
 
-import model
-from model import jac_an, Avv_an, xi, vi
+import model_exp as model
+from model_exp import jac_an, Avv_an, xi, vi
 
 if model.jax_avail:
     import mbam.auto_diff as ad
