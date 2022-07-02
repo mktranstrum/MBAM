@@ -8,6 +8,8 @@ except ModuleNotFoundError:
     jax_avail = False
 
 
+np.random.seed(1717)
+
 # Time series
 t = np.array([1.0, 2.0, 3.0])
 if jax_avail:
