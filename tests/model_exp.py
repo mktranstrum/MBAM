@@ -37,7 +37,7 @@ if jax_avail:
 
 def jac_an(x):
     """Compute the jacobian analytically. -t*exp(-th*t)"""
-    return np.array([-t * np.exp(-xi[0] * t), -t * np.exp(-xi[1] * t)]).T
+    return np.array([-t * np.exp(-x[0] * t), -t * np.exp(-x[1] * t)]).T
 
 
 def Avv_an(x, v):

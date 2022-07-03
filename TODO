@@ -9,6 +9,6 @@ TODO list
   - [X] Attribution - How to cite the papers
   - [X] Licence
 - [X] A wrapper to compute jacobian and Avv using autograd/JAX.
-- [-] Unit test
+- [X] Unit test
   - [X] Derivative: Compare analytic to finite difference, jacobian, Avv, jax
-  - [ ] Geodesic: Use a linear model. Compare the geodesic vector to eigenvector.
+  - [X] Geodesic: Use a linear model. Compare the geodesic vector to eigenvector.
