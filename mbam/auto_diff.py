@@ -2,8 +2,8 @@
 differentiation using JAX.
 """
 
-import jax
 import jax.numpy as jnp
+from jax import jacfwd
 
 
 def jacobian_func(f):
@@ -27,7 +27,7 @@ def jacobian_func(f):
     the residual function, assuming that the weights are encoded in the
     residual.
     """
-    jacobian = jax.jacfwd(f)
+    jacobian = jacfwd(f)
     return jacobian
 
 
@@ -52,10 +52,11 @@ def Avv_func(f):
     the residual function, assuming that the weights are encoded in the
     residual.
     """
-    hess = jax.hessian(f)
 
     def Avv(x, v):
-        H = hess(x)
-        return H @ v @ v
+        def F(s):
+            return f(x + v * s)
+
+        return jacfwd(jacfwd(F))(0.0)
 
     return Avv
