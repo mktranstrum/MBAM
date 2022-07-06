@@ -9,7 +9,7 @@ J_fn = jacobian_func(f, M, N)
 Avv_fn = Avv_func(f)
 
 # Calculate the geodesic
-geo = Geodesic(f, J_fn, Avv_fn, M, N, xi, vi)
+geo = Geodesic(f, J_fn, Avv_fn, xi, vi)
 geo.integrate(1000.0)
 len_ts = len(geo.ts)
 

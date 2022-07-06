@@ -18,10 +18,6 @@ class Geodesic(ode):
         Function for calculating the second directional derivative of the
         model in a direction ``v``. The default function uses central
         difference method.
-    M: int
-        Number of model predictions.
-    N: int
-        Number of model parameters.
     x: (N,) np.ndarray
         Vector of initial parameter values.
     v: np.ndarray
@@ -50,9 +46,9 @@ class Geodesic(ode):
     Attributes
     ----------
     xs: (T, N) np.ndarray
-        Geodesics in the parameter space.
+        Geodesics in the parameter space. :math:`N` is the number of parameters.
     rs: (T, M) np.ndarray
-        Geodesics in the data space.
+        Geodesics in the data space. :math:`N` is the number of predictions.
     vs: (T, N) np.ndarray
         Velocity in the parameter space.
     vels: (T, M) np.ndarray
@@ -74,8 +70,6 @@ class Geodesic(ode):
         r,
         j,
         Avv,
-        M,
-        N,
         x,
         v,
         lam=0.0,
@@ -87,8 +81,7 @@ class Geodesic(ode):
         invSVD=False,
     ):
 
-        # Dimensionality of the problem
-        self.M, self.N = M, N
+        self.N = len(x)
 
         # Functions needed in the calculation
         self.r, self.j, self.Avv = r, j, Avv
@@ -106,7 +99,7 @@ class Geodesic(ode):
         # Additional settings for RHS function
         self.lam = lam
         if dtd is None:
-            self.dtd = np.eye(N)
+            self.dtd = np.eye(self.N)
         else:
             self.dtd = dtd
         self.parameterspacenorm = parameterspacenorm

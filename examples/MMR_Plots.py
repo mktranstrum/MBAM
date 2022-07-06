@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from mbam import Geodesic, initial_velocity
 
-from MMR import M, N, r, j, Avv
+from MMR import r, j, Avv
 
 
 # Choose starting parameters
@@ -26,9 +26,7 @@ def callback(g):
 # Construct the geodesic
 # It is usually not necessary to be very accurate here, so we set small
 # tolerances
-geo_forward = Geodesic(
-    r, j, Avv, M, N, x, v, atol=1e-2, rtol=1e-2, callback=callback
-)
+geo_forward = Geodesic(r, j, Avv, x, v, atol=1e-2, rtol=1e-2, callback=callback)
 
 # Integrate
 geo_forward.integrate(25.0)
@@ -51,9 +49,7 @@ v = -initial_velocity(x, j, Avv)
 # Construct the geodesic
 # It is usually not necessary to be very accurate here, so we set small
 # tolerances
-geo_reverse = Geodesic(
-    r, j, Avv, M, N, x, v, atol=1e-2, rtol=1e-2, callback=callback
-)
+geo_reverse = Geodesic(r, j, Avv, x, v, atol=1e-2, rtol=1e-2, callback=callback)
 
 # Integrate
 geo_reverse.integrate(25.0)
