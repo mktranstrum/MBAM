@@ -1,0 +1,14 @@
+TODO list
+- [-] Convert the geodesic/MBAM into a Python package (WIP)
+  - [X] setup.py
+  - [ ] Work on the organization of the package (check with Mark)
+- [X] Documentation for each functions
+- [X] README
+  - [X] Installation
+  - [X] Example
+  - [X] Attribution - How to cite the papers
+  - [X] Licence
+- [X] A wrapper to compute jacobian and Avv using autograd/JAX.
+- [X] Unit test
+  - [X] Derivative: Compare analytic to finite difference, jacobian, Avv, jax
+  - [X] Geodesic: Use a linear model. Compare the geodesic vector to eigenvector.
