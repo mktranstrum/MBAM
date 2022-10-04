@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.integrate import cumulative_trapezoid
 from mbam import Geodesic
 from mbam.finite_difference import jacobian_func, Avv_func
 
@@ -18,8 +19,8 @@ def test_attributes():
     assert hasattr(geo, "xs")
     assert hasattr(geo, "rs")
     assert hasattr(geo, "vs")
-    assert hasattr(geo, "vels")
     assert hasattr(geo, "ts")
+    assert hasattr(geo, "taus")
 
 
 def test_derivative_shape():
@@ -55,10 +56,14 @@ def test_rs():
         assert np.allclose(rs, J @ xs)
 
 
-def test_vels():
-    assert geo.vels.shape == (len_ts, M)
-    for vs, vels in zip(geo.vs, geo.vels):
-        assert np.allclose(vels, J @ vs)
+def test_taus():
+    """The product J.v gives dtau/dt. So, we can integrate this quantity and
+    compare it to geo.taus.
+    """
+    assert geo.taus.shape == (len_ts,)
+    dtaus = [np.linalg.norm(J_fn(xs) @ vs) for xs, vs in zip(geo.xs, geo.vs)]
+    taus = np.append(0.0, cumulative_trapezoid(dtaus, geo.ts))
+    assert np.allclose(geo.taus, taus)
 
 
 if __name__ == "__main__":
@@ -68,4 +73,4 @@ if __name__ == "__main__":
     test_vs()
     test_xs()
     test_rs()
-    test_vels()
+    test_taus()

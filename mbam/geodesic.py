@@ -51,10 +51,10 @@ class Geodesic(ode):
         Geodesics in the data space. :math:`N` is the number of predictions.
     vs: (T, N) np.ndarray
         Velocity in the parameter space.
-    vels: (T, M) np.ndarray
-        Velocity in the data space.
     ts: (T,) np.ndarray
-        Geodesics time.
+        Geodesic arclength in parameter space.
+    taus: (T,) np.ndarray
+        Geodesic arclength in data space.
 
     Notes
     -----
@@ -105,7 +105,7 @@ class Geodesic(ode):
         self.parameterspacenorm = parameterspacenorm
         self.invSVD = invSVD
 
-    def geodesic_rhs(self, t, xv):
+    def geodesic_rhs(self, t, xvtau):
         """This function implements the RHS of the geodesic equation. This
         equation is given by
 
@@ -119,11 +119,11 @@ class Geodesic(ode):
         ----------
         t: float
             "time" of the geodesic (tau).
-        xv: (2N,) np.ndarray
-            Vector of current parameters and velocities.
+        xvtau: (2N + 1,) np.ndarray
+            Vector of current parameters, velocities, and data space distance.
         """
-        x = xv[: self.N]
-        v = xv[self.N :]
+        x = xvtau[: self.N]
+        v = xvtau[self.N : -1]
         j = self.j(x)
         g = j.T @ j + self.lam * self.dtd
         Avv = self.Avv(x, v)
@@ -134,7 +134,8 @@ class Geodesic(ode):
             a = -np.linalg.solve(g, j.T @ Avv)
         if self.parameterspacenorm:
             a -= a @ v * v / (v @ v)
-        return np.append(v, a)
+        dtau = np.linalg.norm(j @ v)
+        return np.concatenate((v, a, [dtau]))
 
     def set_initial_value(self, x, v):
         """Set the initial parameter values and velocities.
@@ -148,10 +149,10 @@ class Geodesic(ode):
         """
         self.xs = np.array([x])
         self.vs = np.array([v])
-        self.ts = np.array([0.0])
         self.rs = np.array([self.r(x)])
-        self.vels = np.array([self.j(x) @ v])
-        ode.set_initial_value(self, np.append(x, v), 0.0)
+        self.taus = np.array([0.0])
+        self.ts = np.array([0.0])
+        ode.set_initial_value(self, np.concatenate((x, v, [0.0])), 0.0)
 
     def step(self, dt=1.0):
         """Integrate the geodesic for one step.
@@ -163,11 +164,9 @@ class Geodesic(ode):
         """
         ode.integrate(self, self.t + dt, step=1)
         self.xs = np.append(self.xs, [self.y[: self.N]], axis=0)
-        self.vs = np.append(self.vs, [self.y[self.N :]], axis=0)
+        self.vs = np.append(self.vs, [self.y[self.N : -1]], axis=0)
         self.rs = np.append(self.rs, [self.r(self.xs[-1])], axis=0)
-        self.vels = np.append(
-            self.vels, [self.j(self.xs[-1]) @ self.vs[-1]], axis=0
-        )
+        self.taus = np.append(self.taus, self.y[-1])
         self.ts = np.append(self.ts, self.t)
 
     def integrate(self, tmax, maxsteps=500):
