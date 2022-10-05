@@ -36,7 +36,7 @@ class Geodesic(ode):
         ``geodesic`` class.
     parameterspacenorm: bool (optional)
         Set to ``True`` to reparameterize the geodesic to have a constant
-        parameter space norm. (Default is to have a constant data space
+        parameter space norm. (Default is to have a constant parameter space
         norm.)
     invSVD: bool (optional)
         Set to true to use the singular value decomposition to calculate
@@ -77,7 +77,7 @@ class Geodesic(ode):
         atol=1e-6,
         rtol=1e-6,
         callback=None,
-        parameterspacenorm=False,
+        parameterspacenorm=True,
         invSVD=False,
     ):
 
