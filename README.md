@@ -6,7 +6,9 @@ Code for the Manifold Boundary Approximation Method
 
 ### Using pip
 
-We are still working on this.
+``` bash
+pip install mbam
+```
 
 ### From source
 
