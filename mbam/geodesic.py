@@ -124,18 +124,22 @@ class Geodesic(ode):
         """
         x = xvtau[: self.N]
         v = xvtau[self.N : -1]
-        j = self.j(x)
-        g = j.T @ j + self.lam * self.dtd
-        Avv = self.Avv(x, v)
-        if self.invSVD:
-            u, s, vh = np.linalg.svd(j, 0)
-            a = -vh.T @ (u.T @ Avv) / s
+        v2 = v @ v
+        if v2 == 0.0:
+            return np.concatenate((v, 0, [0]))
         else:
-            a = -np.linalg.solve(g, j.T @ Avv)
-        if self.parameterspacenorm:
-            a -= a @ v * v / (v @ v)
-        dtau = np.linalg.norm(j @ v)
-        return np.concatenate((v, a, [dtau]))
+            j = self.j(x)
+            g = j.T @ j + self.lam * self.dtd
+            Avv = self.Avv(x, v)
+            if self.invSVD:
+                u, s, vh = np.linalg.svd(j, 0)
+                a = -vh.T @ (u.T @ Avv) / s
+            else:
+                a = -np.linalg.solve(g, j.T @ Avv)
+            if self.parameterspacenorm:
+                a -= a @ v * v / (v2)
+            dtau = np.linalg.norm(j @ v)
+            return np.concatenate((v, a, [dtau]))
 
     def set_initial_value(self, x, v):
         """Set the initial parameter values and velocities.
