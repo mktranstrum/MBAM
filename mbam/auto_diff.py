@@ -44,7 +44,7 @@ def Avv_func(f):
     -------
     Avv: callable ``Avv(x, v)``
         A function that evaluates the directional second derivative (Avv) of
-        the model ``r`` at parameter ``x`` in the ``v`` direction.
+        the model ``f`` at parameter ``x`` in the ``v`` direction.
 
     Notes
     -----

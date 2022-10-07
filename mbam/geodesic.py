@@ -36,8 +36,7 @@ class Geodesic(ode):
         ``geodesic`` class.
     parameterspacenorm: bool (optional)
         Set to ``True`` to reparameterize the geodesic to have a constant
-        parameter space norm. (Default is to have a constant parameter space
-        norm.)
+        parameter space norm and ``False`` to have a constant data space norm.
     invSVD: bool (optional)
         Set to true to use the singular value decomposition to calculate
         the inverse metric. This is slower, but can help with nearly
@@ -52,9 +51,9 @@ class Geodesic(ode):
     vs: (T, N) np.ndarray
         Velocity in the parameter space.
     ts: (T,) np.ndarray
-        Geodesic arclength in parameter space.
+        Geodesic arclength in the parameter space.
     taus: (T,) np.ndarray
-        Geodesic arclength in data space.
+        Geodesic arclength in the data space.
 
     Notes
     -----
@@ -142,7 +141,7 @@ class Geodesic(ode):
             return np.concatenate((v, a, [dtau]))
 
     def set_initial_value(self, x, v):
-        """Set the initial parameter values and velocities.
+        """Set the initial parameter values and velocity.
 
         Parameters
         ----------
